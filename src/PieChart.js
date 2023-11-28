@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const PieChart = () => {
   const [graphData, setGraphData] = useState({
-    labels: [],
+    labels: ['Below 18', 'Between 18 and 60', 'Above 60'],
     datasets: [{
       data: [],
       backgroundColor: [
@@ -23,31 +23,76 @@ const PieChart = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const query = `
-        PREFIX dbo: <http://dbpedia.org/ontology/>
-        PREFIX dbr: <http://dbpedia.org/resource/>
+      // Use the proxy route for the SPARQL endpoint
+      const endpointUrl = `/sparql`;
 
-        SELECT ?city ?population WHERE {
-          VALUES ?city { dbr:New_York_City dbr:Los_Angeles dbr:Chicago }
-          ?city dbo:populationTotal ?population .
+      // Your SPARQL query should be a complete and correct query string
+      const query = `
+      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+      PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+      SELECT 
+        (ROUND((xsd:decimal(?countUnder18) / xsd:decimal(?total) * 100)*100)/100 AS ?percentUnder18)
+        (ROUND((xsd:decimal(?countBetween) / xsd:decimal(?total) * 100)*100)/100 AS ?percentBetween18And60)
+        (ROUND((xsd:decimal(?countAbove60) / xsd:decimal(?total) * 100)*100)/100 AS ?percentAbove60)
+      WHERE {
+        {
+          SELECT (COUNT(DISTINCT ?individual) AS ?total) WHERE {
+            ?individual rdf:type project-2:victim .
+          }
         }
-      `;
-      const url = `http://dbpedia.org/sparql?query=${encodeURIComponent(query)}&format=json`;
+        {
+          SELECT (COUNT(DISTINCT ?individualUnder18) AS ?countUnder18) WHERE {
+            ?individualUnder18 rdf:type project-2:victim ;
+                               project-2:hasAge ?ageString .
+            BIND(xsd:integer(?ageString) AS ?age)
+            FILTER(?age < 18)
+          }
+        }
+        {
+          SELECT (COUNT(DISTINCT ?individualBetween) AS ?countBetween) WHERE {
+            ?individualBetween rdf:type project-2:victim ;
+                               project-2:hasAge ?ageString .
+            BIND(xsd:integer(?ageString) AS ?age)
+            FILTER(?age >= 18 && ?age <= 60)
+          }
+        }
+        {
+          SELECT (COUNT(DISTINCT ?individualAbove60) AS ?countAbove60) WHERE {
+            ?individualAbove60 rdf:type project-2:victim ;
+                               project-2:hasAge ?ageString .
+            BIND(xsd:integer(?ageString) AS ?age)
+            FILTER(?age > 60)
+          }
+        }
+      }`;
 
       try {
-        const response = await axios.get(url);
-        const fetchedData = response.data.results.bindings;
+        const response = await axios.get(`${endpointUrl}?query=${encodeURIComponent(query)}&format=json`);
+        const results = response.data.results.bindings;
 
-        const labels = fetchedData.map(item => item.city.value.split('/').pop());
-        const data = fetchedData.map(item => Number(item.population.value));
+        // Extract percentages from the SPARQL results
+        const percentages = results.map(result => ({
+          percentUnder18: parseFloat(result.percentUnder18.value),
+          percentBetween18And60: parseFloat(result.percentBetween18And60.value),
+          percentAbove60: parseFloat(result.percentAbove60.value)
+        }));
 
-        setGraphData({
-          labels: labels,
-          datasets: [{
-            ...graphData.datasets[0],
-            data: data
-          }]
-        });
+        // Assuming the first result contains the data we want
+        if (percentages.length > 0) {
+          setGraphData(prevData => ({
+            ...prevData,
+            datasets: [{
+              ...prevData.datasets[0],
+              data: [
+                percentages[0].percentUnder18,
+                percentages[0].percentBetween18And60,
+                percentages[0].percentAbove60
+              ]
+            }]
+          }));
+        }
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -58,7 +103,7 @@ const PieChart = () => {
 
   return (
     <div className="graph-container">
-      <h3>Pie Chart - City Populations</h3>
+      <h3>Age Distribution Pie Chart</h3>
       <Pie data={graphData} />
     </div>
   );
