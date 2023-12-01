@@ -69,29 +69,43 @@ const PieChart = () => {
       }`;
 
       try {
-        const response = await axios.get(`${endpointUrl}?query=${encodeURIComponent(query)}&format=json`);
+        const response = await axios.get(endpointUrl, {
+          params: {
+            query: query,
+            format: 'json'
+          },
+          headers: {
+            'Cache-Control': 'no-store'
+          }
+        });        console.log('Raw response:', response); // Log the raw response
+  
         const results = response.data.results.bindings;
-
-        // Extract percentages from the SPARQL results
+        console.log('SPARQL results:', results); // Log the results from SPARQL query
+  
         const percentages = results.map(result => ({
           percentUnder18: parseFloat(result.percentUnder18.value),
           percentBetween18And60: parseFloat(result.percentBetween18And60.value),
           percentAbove60: parseFloat(result.percentAbove60.value)
         }));
-
+        console.log('Percentages:', percentages); // Log the mapped percentages
+  
         // Assuming the first result contains the data we want
         if (percentages.length > 0) {
-          setGraphData(prevData => ({
-            ...prevData,
-            datasets: [{
-              ...prevData.datasets[0],
-              data: [
-                percentages[0].percentUnder18,
-                percentages[0].percentBetween18And60,
-                percentages[0].percentAbove60
-              ]
-            }]
-          }));
+          setGraphData(prevData => {
+            const newData = {
+              ...prevData,
+              datasets: [{
+                ...prevData.datasets[0],
+                data: [
+                  percentages[0].percentUnder18,
+                  percentages[0].percentBetween18And60,
+                  percentages[0].percentAbove60
+                ]
+              }]
+            };
+            console.log('New graph data:', newData); // Log the new state just before setting it
+            return newData;
+          });
         }
       } catch (error) {
         console.error('Error fetching data: ', error);

@@ -7,7 +7,7 @@ const LineGraph = () => {
   const [graphData, setGraphData] = useState({
     labels: [],
     datasets: [{
-      label: 'Dataset from DBpedia',
+      label: 'Number of Victims',
       fill: false,
       lineTension: 0.1,
       backgroundColor: 'rgba(75,192,192,0.4)',
@@ -27,25 +27,43 @@ const LineGraph = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Dummy data for the sake of example
-      const labels = ['2010', '2011', '2012', '2013', '2014', '2015'];
-      const data = [8175133, 8272948, 8346693, 8396091, 8433806, 8463049];
-  
-      setGraphData(prevGraphData => ({
-        ...prevGraphData,
-        labels: labels,
-        datasets: [{
-          ...prevGraphData.datasets[0],
-          data: data
-        }]
-      }));
+      // SPARQL Query
+      const endpointUrl = '/sparql'; 
+      const query = `
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+        SELECT ?year (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+        WHERE {
+          ?victim rdf:type project-2:victim .
+          ?victim project-2:hasYear ?year .
+        }
+        GROUP BY ?year
+        ORDER BY DESC(?numberOfVictims)
+      `;
+
+      try {
+        const response = await axios.get(`${endpointUrl}?query=${encodeURIComponent(query)}&format=json`);
+        const results = response.data.results.bindings;
+
+        const labels = results.map(result => result.year.value);
+        const data = results.map(result => parseInt(result.numberOfVictims.value));
+
+        setGraphData(prevGraphData => ({
+          ...prevGraphData,
+          labels: labels,
+          datasets: [{
+            ...prevGraphData.datasets[0],
+            data: data
+          }]
+        }));
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
     };
-  
+
     fetchData();
-  
-    // Remove graphData from the dependencies array to prevent re-fetching on every render
   }, []);
-  
 
   return (
     <div className="graph-container">

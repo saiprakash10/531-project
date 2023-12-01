@@ -7,10 +7,10 @@ module.exports = function(app) {
       target: 'http://localhost:3030', // The SPARQL endpoint
       changeOrigin: true,
       pathRewrite: {
-        '^/sparql': '/xx/query', // Rewrite the path to the SPARQL endpoint path
+        '^/sparql': '/final/query', 
       },
       onProxyRes: function (proxyRes, req, res) {
-        proxyRes.headers['Access-Control-Allow-Origin'] = '*'; // Add CORS header
+        proxyRes.headers['Access-Control-Allow-Origin'] = '*'; 
       }
     })
   );
