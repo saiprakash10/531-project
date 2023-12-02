@@ -28,12 +28,12 @@ const VictimsByRaceChart = () => {
       },
     ],
   });
+  const endpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
+  const dbName = process.env.REACT_APP_STARDOG_DBNAME;
+  const username = process.env.REACT_APP_STARDOG_USERNAME;
+  const password = process.env.REACT_APP_STARDOG_PASSWORD;
 
-  useEffect(() => {
-    const fetchChartData = async () => {
-      const endpointUrl = `/sparql`;
-      // Ensure the query string is not already encoded
-      const query = `
+  const sparqlQuery = `
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
@@ -56,45 +56,52 @@ const VictimsByRaceChart = () => {
         GROUP BY ?raceLabel
         ORDER BY DESC(?numberOfVictims)
       `;
-    
+
+  useEffect(() => {
+    const fetchChartData = async () => {
       try {
-        const response = await axios.get(endpointUrl, {
-          params: {
-            query: query, // Axios will handle encoding for you
-            format: 'json',
+        const response = await axios({
+          method: 'post',
+          url: `${endpoint}/${dbName}/query`,
+          auth: {
+            username: username,
+            password: password,
           },
           headers: {
-            'Accept': 'application/sparql-results+json',
             'Content-Type': 'application/x-www-form-urlencoded',
-          }
+            'Accept': 'application/sparql-results+json'
+          },
+          data: `query=${encodeURIComponent(sparqlQuery)}`
         });
-        // ... process and use the data
+        
+        
         const results = response.data.results.bindings;
-
+    
         const labels = results.map(result => result.raceLabel.value);
         const data = results.map(result => parseInt(result.numberOfVictims.value, 10));
-
-        setChartData({
+    
+        setChartData(prevChartData => ({
           labels: labels,
           datasets: [
             {
-              ...chartData.datasets[0],
+              ...prevChartData.datasets[0],
               data: data,
             },
           ],
-        });
+        }));
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
     };
+    
     
 
     fetchChartData();
   }, []);
 
   return (
-    <div>
-      <h2 className="text-center text-xl font-medium my-4">Number of Victims by Race</h2>
+    <div className='graph-container my-4 p-4'>
+      <h2 className="text-xl font-semibold text-center"> Number of Victims by Race</h2>
       <Bar data={chartData} options={{ scales: { y: { beginAtZero: true } } }} />
     </div>
   );

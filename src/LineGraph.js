@@ -25,27 +25,40 @@ const LineGraph = () => {
     }]
   });
 
+  const endpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
+  const dbName = process.env.REACT_APP_STARDOG_DBNAME;
+  const auth = {
+    username: process.env.REACT_APP_STARDOG_USERNAME,
+    password: process.env.REACT_APP_STARDOG_PASSWORD
+  };
+
+  const sparqlQuery = `
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+    SELECT ?year (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+    WHERE {
+      ?victim rdf:type project-2:victim .
+      ?victim project-2:hasYear ?year .
+    }
+    GROUP BY ?year
+    ORDER BY DESC(?numberOfVictims)
+  `;
+  
   useEffect(() => {
     const fetchData = async () => {
-      // SPARQL Query
-      const endpointUrl = '/sparql'; 
-      const query = `
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
-
-        SELECT ?year (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
-        WHERE {
-          ?victim rdf:type project-2:victim .
-          ?victim project-2:hasYear ?year .
-        }
-        GROUP BY ?year
-        ORDER BY DESC(?numberOfVictims)
-      `;
-
       try {
-        const response = await axios.get(`${endpointUrl}?query=${encodeURIComponent(query)}&format=json`);
-        const results = response.data.results.bindings;
+        const response = await axios({
+          method: 'post',
+          url: `${endpoint}/${dbName}/query`,
+          auth: auth,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/sparql-results+json'
+          },
+          data: `query=${encodeURIComponent(sparqlQuery)}`
+        });
 
+        const results = response.data.results.bindings;
         const labels = results.map(result => result.year.value);
         const data = results.map(result => parseInt(result.numberOfVictims.value));
 
@@ -66,8 +79,8 @@ const LineGraph = () => {
   }, []);
 
   return (
-    <div className="graph-container">
-      <h3>Line Graph</h3>
+    <div className="graph-container my-4 p-4">
+      <h3 className="text-xl font-semibold text-center">Victims by year</h3>
       <Line data={graphData} />
     </div>
   );

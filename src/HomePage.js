@@ -2,34 +2,38 @@ import React from 'react';
 
 const HomePage = () => {
   return (
-    <div className="max-w-4xl mx-auto p-5">
-      <h1 className="text-3xl font-bold text-center mb-6">Police Killings Visualization</h1>
-      <p className="text-lg text-gray-700 mb-4">
-        This site is dedicated to providing visual insights into police killings across the country.
-        Here, you can explore various data-driven graphics and charts that help to understand the patterns and circumstances of these incidents.
-      </p>
-      
-      <h2 className="text-2xl font-semibold mb-3">Historical Context</h2>
-      <p className="text-gray-700 mb-4">
-        The United States has a long history of law enforcement-related deaths. This issue is particularly pronounced in communities of color. African Americans, for example, have been disproportionately affected by police violence compared to their white counterparts.
-      </p>
-      
-      {/* ... Additional sections ... */}
-      
-      <h2 className="text-2xl font-semibold mb-3">Statistical Overview</h2>
-      <p className="text-gray-700 mb-4">
-        The rate of fatal police shootings in the United States shows significant numbers. According to various databases tracking police shootings, there are consistently high numbers of fatalities each year. These databases also highlight disparities based on race and ethnicity.
-      </p>
-      
-      {/* ... Additional sections ... */}
-      
-      {/* Consider breaking down the content into components like StatisticalOverview, RacialDisparities, etc. */}
+    <main className="max-w-6xl mx-auto my-5 p-5">
+      <header className="text-center my-10">
+        <h1 className="text-4xl font-bold mb-6">Police Killings Visualization</h1>
+        
+      </header>
 
-      {/* Visualization Components Placeholder */}
-      <div className="my-10">
-        {/* Insert your data visualization components here */}
-      </div>
-    </div>
+      <p className="text-xl text-gray-700 my-5">
+          Explore data-driven insights into police killings across the United States.
+          Understand the patterns and examine the circumstances of these incidents through interactive visualizations.
+        </p>
+      
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-5">Historical Context</h2>
+        <p className="text-gray-700 mb-6">
+          The United States has a complex history with law enforcement-related fatalities, with communities of color being disproportionately affected. 
+          This platform seeks to shed light on these incidents, providing a historical perspective that contextualizes contemporary data.
+        </p>
+      </section>
+      
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-5">Statistical Overview</h2>
+        <p className="text-gray-700">
+          Analyses of fatal police shooting rates in the United States indicate persistent high levels of fatalities, year over year.
+          Compilations from various databases reveal stark disparities when dissected by race and ethnicity, hinting at systemic issues within law enforcement practices.
+        </p>
+      </section>
+
+  
+
+      <footer className="my-10">
+      </footer>
+    </main>
   );
 }
 

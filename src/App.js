@@ -11,8 +11,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/Graphs" element={<Graph />} />
-        {/* Add other routes here */}
       </Routes>
+
+      
     </Router>
   );
 }

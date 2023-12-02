@@ -4,45 +4,63 @@ import axios from 'axios';
 const VictimsByStateTable = () => {
   const [statesData, setStatesData] = useState([]);
 
+  const endpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
+  const dbName = process.env.REACT_APP_STARDOG_DBNAME;
+  const username = process.env.REACT_APP_STARDOG_USERNAME;
+  const password = process.env.REACT_APP_STARDOG_PASSWORD;
+  const sparqlQuery = `
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+    SELECT ?state (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+    WHERE {
+      ?victim project-2:hasGeographicArea ?state .
+    }
+    GROUP BY ?state
+    ORDER BY DESC(?numberOfVictims)
+  `;
+
   useEffect(() => {
     const fetchStatesData = async () => {
-      const endpointUrl = `/sparql`;
-      const query = `
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-        PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
-
-        SELECT ?state (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
-        WHERE {
-          ?victim project-2:hasGeographicArea ?state .
-        }
-        GROUP BY ?state
-        ORDER BY DESC(?numberOfVictims)
-      `;
-
       try {
-        const response = await axios.get(`${endpointUrl}?query=${encodeURIComponent(query)}&format=json`);
-        const results = response.data.results.bindings;
+        const response = await axios({
+          method: 'post',
+          url: `${endpoint}/${dbName}/query`,
+          auth: {
+            username: username,
+            password: password,
+          },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/sparql-results+json'
+          },
+          data: `query=${encodeURIComponent(sparqlQuery)}`
+        });
+        
 
-        const formattedData = results.map(result => ({
-          state: result.state.value,
-          numberOfVictims: parseInt(result.numberOfVictims.value.split('^^')[0], 10) // Parse the integer value
-        }));
 
-        setStatesData(formattedData);
+        if (response.status === 200) {
+          const formattedData = response.data.results.bindings.map(item => ({
+            state: item.state.value,
+            numberOfVictims: item.numberOfVictims.value
+          }));
+          setStatesData(formattedData);
+        } else {
+          console.error('API response not successful:', response);
+        }
       } catch (error) {
         console.error('Error fetching data: ', error);
-        // Optionally, handle the error state here
       }
     };
 
     fetchStatesData();
-  }, []);
+  }, [endpoint, dbName, username, password, sparqlQuery]);
 
   return (
-    <div className="container mx-auto mt-10">
-      <h2 className="text-center text-2xl font-semibold text-blue-600 mb-4">Number of Victims by State</h2>
-      <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="container mx-auto my-4 p-4">
+      <h2 className="text-xl font-semibold text-center">Number of Victims by State</h2>
+      <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden my-4">
         <thead className="bg-blue-500 text-white">
           <tr>
             <th className="text-left py-3 px-4 uppercase font-semibold text-sm">State</th>
