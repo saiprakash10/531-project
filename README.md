@@ -1,70 +1,44 @@
-# Getting Started with Create React App
+# 531-Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This React.js app visualizes data using react-chartjs-2, querying RDF data hosted on Stardog cloud with SPARQL for data representation.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+Before you begin, ensure you have met the following requirements:
 
-### `npm start`
+- You have `node` and `npm` installed.
+- You have a Stardog cloud instance accessible.
+- You have set up your `.env` file based on the `.env.example` provided.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setting Up
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To set up the project, follow these steps:
 
-### `npm test`
+1. Clone the repository:
+ ```shell
+ git clone https://your-repository-url-here
+  ```
+2. Navigate to the project directory:
+ ```shell
+ cd 531-project
+ ```
+3. Install dependencies:
+  ```shell
+   npm install
+   ```
+4. Set up your .env file with the correct Stardog cloud details:
+  ```shell
+  REACT_APP_STARDOG_ENDPOINT=<Your Stardog Endpoint>
+  REACT_APP_STARDOG_DBNAME=<Your Database Name>
+  REACT_APP_STARDOG_USERNAME=<Your Stardog Username>
+  REACT_APP_STARDOG_PASSWORD=<Your Stardog Password>
+   ```
+  Make sure to replace the placeholder values with your actual Stardog cloud instance details.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+5. Running the Application
+   To run the application, execute:
+  ```shell
+   npm start
+   ```
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This will start the development server and open the application in your default web browser. If it doesn't open automatically, you can visit http://localhost:3000 to view it.
