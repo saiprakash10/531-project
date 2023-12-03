@@ -17,3 +17,9 @@ code {
     monospace;
 }
 
+
+.cont {
+  max-height: 90vh; 
+  overflow-y: auto;
+}
+

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const VictimsByStateTable = () => {
-  const [statesData, setStatesData] = useState([]);
+const WeaponsTable = () => {
+  const [weaponsData, setWeaponsData] = useState([]);
 
   const endpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
   const dbName = process.env.REACT_APP_STARDOG_DBNAME;
@@ -13,16 +13,18 @@ const VictimsByStateTable = () => {
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
 
-    SELECT ?state (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+    SELECT (strafter(str(?weapon), '#') AS ?weapons) (COUNT(?victim) AS ?countVictims)
     WHERE {
-      ?victim project-2:hasGeographicArea ?state .
+      ?victim rdf:type project-2:victim .
+      ?victim project-2:hasWeapon ?weapon .
     }
-    GROUP BY ?state
-    ORDER BY DESC(?numberOfVictims)
+    GROUP BY ?weapon
+    ORDER BY DESC(?countVictims)
+    LIMIT 15
   `;
 
   useEffect(() => {
-    const fetchStatesData = async () => {
+    const fetchWeaponsData = async () => {
       try {
         const response = await axios({
           method: 'post',
@@ -37,15 +39,13 @@ const VictimsByStateTable = () => {
           },
           data: `query=${encodeURIComponent(sparqlQuery)}`
         });
-        
-
 
         if (response.status === 200) {
           const formattedData = response.data.results.bindings.map(item => ({
-            state: item.state.value,
-            numberOfVictims: item.numberOfVictims.value
+            weapon: item.weapons.value,
+            countVictims: item.countVictims.value
           }));
-          setStatesData(formattedData);
+          setWeaponsData(formattedData);
         } else {
           console.error('API response not successful:', response);
         }
@@ -54,25 +54,25 @@ const VictimsByStateTable = () => {
       }
     };
 
-    fetchStatesData();
+    fetchWeaponsData();
   }, [endpoint, dbName, username, password, sparqlQuery]);
 
   return (
-    <div className="container mx-auto my-4 p-4">
-      <h2 className="text-xl font-semibold text-center">Number of Victims by State</h2>
+    <div className="cont mx-auto my-4 p-4">
+      <h2 className="text-xl font-semibold text-center">Count of Victims by Weapon Held</h2>
       <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden my-4">
         <thead className="bg-blue-500 text-white">
           <tr>
-            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">State</th>
+            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Weapon</th>
             <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Number of Victims</th>
           </tr>
         </thead>
         <tbody className="text-gray-700">
-          {statesData.length > 0 ? (
-            statesData.map((stateData, index) => (
+          {weaponsData.length > 0 ? (
+            weaponsData.map((weaponData, index) => (
               <tr className={`border-b ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`} key={index}>
-                <td className="text-left py-3 px-4">{stateData.state}</td>
-                <td className="text-left py-3 px-4">{stateData.numberOfVictims}</td>
+                <td className="text-left py-3 px-4">{weaponData.weapon}</td>
+                <td className="text-left py-3 px-4">{weaponData.countVictims}</td>
               </tr>
             ))
           ) : (
@@ -86,4 +86,4 @@ const VictimsByStateTable = () => {
   );
 };
 
-export default VictimsByStateTable;
+export default WeaponsTable;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const VictimDataComponent = () => {
+const VictimCountbyState = () => {
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState('');
   const [victimCount, setVictimCount] = useState(0);
@@ -95,5 +95,5 @@ const VictimDataComponent = () => {
   
 };
 
-export default VictimDataComponent;
+export default VictimCountbyState;
   

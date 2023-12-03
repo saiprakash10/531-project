@@ -5,18 +5,17 @@ import 'chart.js/auto';
 
 const PieChart = () => {
   const [graphData, setGraphData] = useState({
-    labels: ['Below 18', 'Between 18 and 60', 'Above 60'],
+    labels: [],
     datasets: [{
       data: [],
       backgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56'
+        '#780505',   
+        '#03520c',   
+
       ],
       hoverBackgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56'
+        '#780505',  
+        '#03520c', 
       ]
     }]
   });
@@ -27,49 +26,28 @@ const PieChart = () => {
     username: process.env.REACT_APP_STARDOG_USERNAME,
     password: process.env.REACT_APP_STARDOG_PASSWORD
   };
-  
- 
 
   const sparqlQuery = `
   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
   PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
   PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
 
-  SELECT 
-    (ROUND((xsd:decimal(?countUnder18) / xsd:decimal(?total) * 100)*100)/100 AS ?percentUnder18)
-    (ROUND((xsd:decimal(?countBetween) / xsd:decimal(?total) * 100)*100)/100 AS ?percentBetween18And60)
-    (ROUND((xsd:decimal(?countAbove60) / xsd:decimal(?total) * 100)*100)/100 AS ?percentAbove60)
-  WHERE {
-    {
-      SELECT (COUNT(DISTINCT ?individual) AS ?total) WHERE {
-        ?individual rdf:type project-2:victim .
-      }
-    }
-    {
-      SELECT (COUNT(DISTINCT ?individualUnder18) AS ?countUnder18) WHERE {
-        ?individualUnder18 rdf:type project-2:victim ;
-                           project-2:hasAge ?ageString .
-        BIND(xsd:integer(?ageString) AS ?age)
-        FILTER(?age < 18)
-      }
-    }
-    {
-      SELECT (COUNT(DISTINCT ?individualBetween) AS ?countBetween) WHERE {
-        ?individualBetween rdf:type project-2:victim ;
-                           project-2:hasAge ?ageString .
-        BIND(xsd:integer(?ageString) AS ?age)
-        FILTER(?age >= 18 && ?age <= 60)
-      }
-    }
-    {
-      SELECT (COUNT(DISTINCT ?individualAbove60) AS ?countAbove60) WHERE {
-        ?individualAbove60 rdf:type project-2:victim ;
-                           project-2:hasAge ?ageString .
-        BIND(xsd:integer(?ageString) AS ?age)
-        FILTER(?age > 60)
-      }
-    }
+SELECT
+(strafter(str(?gender), '#') AS ?genders)
+(COUNT(?victim) AS ?countVictims)
+(ROUND((COUNT(?victim) / ?totalVictims * 100), 2) AS ?percentage)
+WHERE {
+?victim rdf:type project-2:victim .
+?victim project-2:hasCityName ?city .
+?victim project-2:hasGender ?gender .
+
+{
+  SELECT (COUNT(?individual) AS ?totalVictims) WHERE {
+    ?individual rdf:type project-2:victim .
   }
+}
+}
+GROUP BY ?gender ?totalVictims
   `;
 
   useEffect(() => {
@@ -89,16 +67,18 @@ const PieChart = () => {
         if (response.status === 200) {
           const { results } = response.data;
           const data = results.bindings.map(binding => ({
-            under18: parseFloat(binding.percentUnder18.value),
-            between18And60: parseFloat(binding.percentBetween18And60.value),
-            above60: parseFloat(binding.percentAbove60.value)
+            gender: binding.genders.value,
+            percentage: parseFloat(binding.percentage.value)
           }));
+
+      
 
           setGraphData(prevData => ({
             ...prevData,
+            labels: data.map(item => item.gender),
             datasets: [{
               ...prevData.datasets[0],
-              data: [data[0].under18, data[0].between18And60, data[0].above60]
+              data: data.map(item => item.percentage)
             }]
           }));
         } else {
@@ -110,11 +90,11 @@ const PieChart = () => {
     };
 
     fetchData();
-  }, []); 
+  }, [endpoint, dbName, auth]);
 
   return (
     <div className="graph-container my-4 p-4">
-      <h3 className="text-xl font-semibold text-center">Age Distribution Pie Chart</h3>
+      <h3 className="text-xl font-semibold text-center">Gender Distribution Pie Chart</h3>
       <Pie data={graphData} />
     </div>
   );

@@ -80,7 +80,7 @@ const LineGraph = () => {
 
   return (
     <div className="graph-container my-4 p-4">
-      <h3 className="text-xl font-semibold text-center">Victims by year</h3>
+      <h3 className="text-xl font-semibold text-center">Victim Count by year</h3>
       <Line data={graphData} />
     </div>
   );
