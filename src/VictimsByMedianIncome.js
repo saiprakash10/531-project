@@ -147,7 +147,7 @@ const VictimsByStateIncomeChart = () => {
           ))}
         </select>
       </div>
-      <div className='overflow-hidden my-4' style={{ height: '600px' }}>
+      <div className='overflow-hidden my-4' style={{ height: '600px' , width: '400px'}}>
         <Bar data={chartData} options={options} />
       </div>
     </div>

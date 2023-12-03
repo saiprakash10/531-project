@@ -148,7 +148,7 @@ const VictimsByStatePovertyChart = () => {
           ))}
         </select>
       </div>
-      <div style={{ height: '600px' }}>
+      <div style={{ height: '600px', width: '400px' }}>
         <Bar data={chartData} options={options} />
       </div>
     </div>
