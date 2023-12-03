@@ -31,8 +31,7 @@ const HomePage = () => {
 
   
 
-      <footer className="my-10">
-      </footer>
+      
     </main>
   );
 }

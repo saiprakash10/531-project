@@ -5,14 +5,14 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const VictimsByStatePovertyChart = () => {
+const VictimsByStateIncomeChart = () => {
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: []
   });
 
-  const [povertyLevel, setPovertyLevel] = useState('below-30');
-  const povertyLevels = ['below-30', '30-70', 'above-70'];
+  const [incomeLevel, setIncomeLevel] = useState('below-25');
+  const incomeLevels = ['below-25', '25-50', 'above-50'];
 
   
   const stardogEndpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
@@ -23,7 +23,7 @@ const VictimsByStatePovertyChart = () => {
 
   const buildSparqlQuery = (level) => {
     switch(level) {
-      case 'below-30':
+      case 'below-25':
         return `
           PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
           PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -33,11 +33,11 @@ const VictimsByStatePovertyChart = () => {
           WHERE {
             ?victim rdf:type project-2:victim .
             ?victim project-2:hasGeographicArea ?state .
-            ?victim project-2:hasPovertyRateBelow30 "true" .
+            ?victim project-2:hasMedianIncomeBelow25K "true" .
           }
           GROUP BY ?state ORDER BY ?state
         `;
-      case '30-70':
+      case '25-50':
         return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
@@ -46,11 +46,11 @@ const VictimsByStatePovertyChart = () => {
         WHERE {
           ?victim rdf:type project-2:victim .
           ?victim project-2:hasGeographicArea ?state .
-          ?victim project-2:hasPovertyRateBetween30to70 "true" .
+          ?victim project-2:hasMedianIncomeBetween25to50K "true" .
         }
         GROUP BY ?state ORDER BY ?state
         `;
-      case 'above-70':
+      case 'above-50':
         return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
@@ -59,7 +59,7 @@ const VictimsByStatePovertyChart = () => {
         WHERE {
           ?victim rdf:type project-2:victim .
           ?victim project-2:hasGeographicArea ?state .
-          ?victim project-2:hasPovertyRateAbove70 "true" .
+          ?victim project-2:hasMedianIncomeAbove50K "true" .
         }
         GROUP BY ?state ORDER BY ?state`;
       default:
@@ -68,7 +68,7 @@ const VictimsByStatePovertyChart = () => {
   };
 
   const fetchData = async () => {
-    const sparqlQuery = buildSparqlQuery(povertyLevel);
+    const sparqlQuery = buildSparqlQuery(incomeLevel);
 
     try {
       const response = await axios({
@@ -85,7 +85,6 @@ const VictimsByStatePovertyChart = () => {
         data: sparqlQuery,
       });
 
-
       const data = response.data.results.bindings.map(binding => ({
         state: binding.state.value,
         count: parseInt(binding.countVictims.value, 10)
@@ -94,7 +93,7 @@ const VictimsByStatePovertyChart = () => {
       setChartData({
         labels: data.map(item => item.state),
         datasets: [{
-          label: 'Count of Victims with Poverty Rate {$povertyLevel}',
+          label: `Count of Victims with Median Income ${incomeLevel.replace('-', ' to ')}`,
           data: data.map(item => item.count),
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
         }]
@@ -106,7 +105,7 @@ const VictimsByStatePovertyChart = () => {
 
   useEffect(() => {
     fetchData();
-  }, [povertyLevel]);
+  }, [incomeLevel]);
 
   const options = {
     indexAxis: 'y',
@@ -132,27 +131,27 @@ const VictimsByStatePovertyChart = () => {
       },
       title: {
         display: true,
-        text: 'Victim Count by State (Poverty Rate $(poverty.Level))'
+        text: `Victim Count by State (Median Income ${incomeLevel.replace('-', ' to ')})`,
       }
     }
   };
 
   return (
-    <div className=' my-4 p-4'>
-      <h2 className="text-xl font-semibold text-center">Victim Count by State</h2>
-      <div className="my-4 ">
-        <label htmlFor="povertyLevelSelect">Select Poverty Level: </label>
-        <select id="povertyLevelSelect" value={povertyLevel} onChange={e => setPovertyLevel(e.target.value)}>
-          {povertyLevels.map(level => (
+    <div className="mx-auto my-4 p-4">
+    <h2 className="text-xl font-semibold text-center">Victim Count by State </h2>
+      <div className="my-4">
+        <label htmlFor="incomeLevelSelect">Select Income Level: </label>
+        <select id="incomeLevelSelect" value={incomeLevel} onChange={e => setIncomeLevel(e.target.value)}>
+          {incomeLevels.map(level => (
             <option key={level} value={level}>{level.replace('-', ' to ')}</option>
           ))}
         </select>
       </div>
-      <div style={{ height: '600px' }}>
+      <div className='overflow-hidden my-4' style={{ height: '600px' }}>
         <Bar data={chartData} options={options} />
       </div>
     </div>
   );
 };
 
-export default VictimsByStatePovertyChart;
+export default VictimsByStateIncomeChart;

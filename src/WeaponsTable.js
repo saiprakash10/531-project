@@ -3,7 +3,8 @@ import axios from 'axios';
 
 const WeaponsTable = () => {
   const [weaponsData, setWeaponsData] = useState([]);
-
+  const [yearData, setYearData] = useState(['2015']);
+  const years = ['2015','2016','2017'];
   const endpoint = process.env.REACT_APP_STARDOG_ENDPOINT;
   const dbName = process.env.REACT_APP_STARDOG_DBNAME;
   const username = process.env.REACT_APP_STARDOG_USERNAME;
@@ -17,11 +18,16 @@ const WeaponsTable = () => {
     WHERE {
       ?victim rdf:type project-2:victim .
       ?victim project-2:hasWeapon ?weapon .
+      ?victim project-2:hasYear "${yearData}" .
     }
     GROUP BY ?weapon
     ORDER BY DESC(?countVictims)
     LIMIT 15
   `;
+
+  const handleChange = (event) => {
+    setYearData(event.target.value);
+  }
 
   useEffect(() => {
     const fetchWeaponsData = async () => {
@@ -54,12 +60,26 @@ const WeaponsTable = () => {
       }
     };
 
+
     fetchWeaponsData();
-  }, [endpoint, dbName, username, password, sparqlQuery]);
+  }, [endpoint, dbName, username, password, sparqlQuery, yearData]);
 
   return (
-    <div className="cont mx-auto my-4 p-4">
+    <div className="mx-auto my-4 p-4">
       <h2 className="text-xl font-semibold text-center">Count of Victims by Weapon Held</h2>
+      <div>
+        <label>
+          Choose a year:
+          <select value={yearData} onChange={handleChange}>
+            {years.map(year => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden my-4">
         <thead className="bg-blue-500 text-white">
           <tr>
