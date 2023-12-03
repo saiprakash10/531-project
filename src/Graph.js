@@ -4,10 +4,8 @@ import BarGraph from './VictimsByRaceChart';
 import PieChart from './PieChart';
 import WeaponsTable from './WeaponsTable';
 import VictimCountbyState from './VictimCountbyState';
-import CitySearchComponent from './CitySearchComponent';
 import DoughnutChart from './DoughnutChart';
 import ScatterPlot from './ScatterPlot'; 
-import BlackVictimDataComponent from './BlackVictimDataComponent'
 import VictimsByStatePoverty from './VictimsByStatePoverty'
 import VictimsByMedianIncome from './VictimsByMedianIncome'
 import RacePercentByCity from './RacePercentByCity'
@@ -28,8 +26,6 @@ const Graphs = () => {
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('scatter')}>Victims by Age</button> 
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('table')}>Weapon Table</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('victimData')}>Victim Count by State</button>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('citySearch')}>Hispanic Victims % by State</button>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('BlackVictim')}>Black Victims % by State</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('VictimPoverty')}>Victims By State Poverty %</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('income')}>Victims By State Median Income Level</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('RacePercentByCity')}>Victim's Race Percentage by City</button>
@@ -46,8 +42,6 @@ const Graphs = () => {
           {currentGraph === 'scatter' && <ScatterPlot />} 
           {currentGraph === 'table' && <WeaponsTable />}
           {currentGraph === 'victimData' && <VictimCountbyState />}
-          {currentGraph === 'citySearch' && <CitySearchComponent />} 
-          {currentGraph === 'BlackVictim' && <BlackVictimDataComponent />} 
           {currentGraph === 'VictimPoverty' && <VictimsByStatePoverty />} 
           {currentGraph === 'income' && <VictimsByMedianIncome />} 
           {currentGraph === 'RacePercentByCity' && <RacePercentByCity />} 
