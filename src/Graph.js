@@ -29,8 +29,6 @@ const Graphs = () => {
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('VictimPoverty')}>Victims By State Poverty %</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('income')}>Victims By State Median Income Level</button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2" onClick={() => setCurrentGraph('RacePercentByCity')}>Victim's Race Percentage by City</button>
-
-
       </div>
 
       <div className="max-h-[600px] w-full  z-10 overflow-y-auto">
@@ -45,7 +43,6 @@ const Graphs = () => {
           {currentGraph === 'VictimPoverty' && <VictimsByStatePoverty />} 
           {currentGraph === 'income' && <VictimsByMedianIncome />} 
           {currentGraph === 'RacePercentByCity' && <RacePercentByCity />} 
-
         </div>
       </div>
 

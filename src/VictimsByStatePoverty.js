@@ -94,7 +94,7 @@ const VictimsByStatePovertyChart = () => {
       setChartData({
         labels: data.map(item => item.state),
         datasets: [{
-          label: 'Count of Victims with Poverty Rate {$povertyLevel}',
+          label: `Count of Victims with Poverty Rate ${povertyLevel.replace('-', ' to ')}`,
           data: data.map(item => item.count),
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
         }]
@@ -132,7 +132,7 @@ const VictimsByStatePovertyChart = () => {
       },
       title: {
         display: true,
-        text: 'Victim Count by State (Poverty Rate $(poverty.Level))'
+        text: `Victim Count by State (Poverty Rate ${povertyLevel.replace('-', ' to ')})`,
       }
     }
   };

@@ -93,7 +93,7 @@ const VictimsByStateIncomeChart = () => {
       setChartData({
         labels: data.map(item => item.state),
         datasets: [{
-          label: `Count of Victims with Median Income ${incomeLevel.replace('-', ' to ')}`,
+          label: `Count of Victims with Median Income ${incomeLevel.replace('-', ' to ')}k`,
           data: data.map(item => item.count),
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
         }]
@@ -131,7 +131,7 @@ const VictimsByStateIncomeChart = () => {
       },
       title: {
         display: true,
-        text: `Victim Count by State (Median Income ${incomeLevel.replace('-', ' to ')})`,
+        text: `Victim Count by State (Median Income ${incomeLevel.replace('-', ' to ')}k)`,
       }
     }
   };
