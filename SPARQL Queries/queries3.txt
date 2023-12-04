@@ -1,0 +1,13 @@
+
+Victims by state:
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+       PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+
+       SELECT ?state (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+       WHERE {
+         ?victim project-2:hasGeographicArea ?state .
+       }
+       GROUP BY ?state
+       ORDER BY DESC(?numberOfVictims)
