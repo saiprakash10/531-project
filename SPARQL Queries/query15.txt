@@ -1,0 +1,14 @@
+Victims by different age:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+     PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+    
+     SELECT ?age (COUNT(?victim) AS ?totalVictims)
+     WHERE {
+       ?victim rdf:type project-2:victim .
+       ?victim project-2:hasDiedLike "shot" .
+       ?victim project-2:hasAge ?age .
+     }
+     GROUP BY ?age
+     ORDER BY DESC(?totalVictims)
+     LIMIT 20
