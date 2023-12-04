@@ -1,0 +1,73 @@
+
+
+Gender distribution:
+
+
+
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+​
+
+SELEC
+
+ (ROUND((xsd:decimal(?countMale) / xsd:decimal(?total)) * 100) AS ?percentMale)
+
+ (ROUND((xsd:decimal(?countFemale) / xsd:decimal(?total)) * 100) AS ?percentFemale)
+
+ (ROUND((xsd:decimal(?countOther) / xsd:decimal(?total)) * 100) AS ?percentOther)
+
+WHERE {
+
+ {
+
+   SELECT (COUNT(DISTINCT ?individual) AS ?total) WHERE {
+
+     ?individual rdf:type project-2:victim .
+
+   }
+
+ }
+
+ {
+
+   SELECT (COUNT(DISTINCT ?individualMale) AS ?countMale) WHERE {
+
+     ?individualMale rdf:type project-2:victim ;
+
+                     project-2:hasGender "M"^^xsd:string .
+
+   }
+
+ }
+
+ {
+
+   SELECT (COUNT(DISTINCT ?individualFemale) AS ?countFemale) WHERE {
+
+     ?individualFemale rdf:type project-2:victim ;
+
+                       project-2:hasGender "F"^^xsd:string .
+
+   }
+
+ }
+
+ {
+
+   SELECT (COUNT(DISTINCT ?individualOther) AS ?countOther) WHERE {
+
+     ?individualOther rdf:type project-2:victim ;
+
+                      project-2:hasGender ?gender .
+
+     FILTER(?gender NOT IN ("M"^^xsd:string, "F"^^xsd:string))
+
+   }
+
+ }
+
+}

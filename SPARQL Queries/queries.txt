@@ -1,0 +1,37 @@
+QUERY for Age distribution:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+SELECT 
+  (ROUND((xsd:decimal(?countUnder18) / xsd:decimal(?total) * 100)*100)/100 AS ?percentUnder18)
+  (ROUND((xsd:decimal(?countBetween) / xsd:decimal(?total) * 100)*100)/100 AS ?percentBetween18And60)
+  (ROUND((100 - ?percentUnder18 - ?percentBetween18And60)*100)/100 AS ?percentAbove60)
+WHERE {
+  {
+    SELECT (COUNT(DISTINCT ?individual) AS ?total) WHERE {
+      ?individual rdf:type project-2:victim .
+    }
+  }
+  {
+    SELECT (COUNT(DISTINCT ?individualUnder18) AS ?countUnder18) WHERE {
+      ?individualUnder18 rdf:type project-2:victim ;
+                         project-2:hasAge ?ageString .
+      BIND(xsd:integer(?ageString) AS ?age)
+      FILTER(?age < 18)
+    }
+  }
+  {
+    SELECT (COUNT(DISTINCT ?individualBetween) AS ?countBetween) WHERE {
+      ?individualBetween rdf:type project-2:victim ;
+                         project-2:hasAge ?ageString .
+      BIND(xsd:integer(?ageString) AS ?age)
+      FILTER(?age >= 18 && ?age <= 60)
+    }
+  }
+}
+
+​
+
+
