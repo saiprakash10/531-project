@@ -1,0 +1,25 @@
+
+Victims by race:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+SELECT ?raceLabel (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+WHERE {
+  ?victim rdf:type project-2:victim .
+  ?victim project-2:hasRace ?race .
+  BIND(
+    IF(?race = project-2:B, "Black",
+      IF(?race = project-2:H, "Hispanic",
+        IF(?race = project-2:A, "Asian",
+          IF(?race = project-2:N, "Native",
+            IF(?race = project-2:O, "Other", "Unknown")
+          )
+        )
+      )
+    ) AS ?raceLabel
+  )
+}
+GROUP BY ?raceLabel
+ORDER BY DESC(?numberOfVictims)
