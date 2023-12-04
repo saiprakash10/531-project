@@ -1,0 +1,15 @@
+QUERY FOR VICTIM COUNT FOR ALL GEOGRAPHIC AREA:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+
+
+SELECT ?geographicArea (COUNT(?victim) AS ?victimCount)
+WHERE {
+  ?victim rdf:type project-2:victim .
+  ?victim project-2:hasGeographicArea ?geographicArea .
+}
+GROUP BY ?geographicArea
+
+
+
