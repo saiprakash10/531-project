@@ -1,0 +1,11 @@
+Victim count by year:
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+   PREFIX project-2: <http://www.semanticweb.org/vchavhan/ontologies/2023/10/project-2#>
+   SELECT ?year (COUNT(DISTINCT ?victim) AS ?numberOfVictims)
+   WHERE {
+     ?victim rdf:type project-2:victim .
+     ?victim project-2:hasYear ?year .
+   }
+   GROUP BY ?year
+   ORDER BY DESC(?numberOfVictims)
